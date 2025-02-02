@@ -15,10 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = require("dotenv");
 const connect_db_1 = __importDefault(require("./config/connect.db"));
+const category_route_1 = __importDefault(require("./routes/category.route"));
+const product_route_1 = __importDefault(require("./routes/product.route"));
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 app.use(express_1.default.json());
+app.use("/api/category", category_route_1.default);
+app.use("/api/products", product_route_1.default);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, connect_db_1.default)();
     app.listen(port, () => {
