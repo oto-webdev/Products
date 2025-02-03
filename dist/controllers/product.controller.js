@@ -13,15 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProduct = exports.getProducts = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const product_model_1 = __importDefault(require("../models/product.model"));
 const async_handler_1 = require("../utils/async.handler");
 exports.getProducts = (0, async_handler_1.asyncHandler)((request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = yield product_model_1.default.find({}).sort({ createdAt: -1 });
-        if (!product) {
-            return response.status(404).json({ message: "Prroduct Not Found" });
-        }
-        return response.status(200).json({ message: "All products", product });
+        const products = yield product_model_1.default.find({}).sort({ createdAt: -1 });
+        return response.status(200).json({ message: "All products", products });
     }
     catch (error) {
         console.log(error);
@@ -29,7 +27,16 @@ exports.getProducts = (0, async_handler_1.asyncHandler)((request, response) => _
     }
 }));
 exports.getProduct = (0, async_handler_1.asyncHandler)((request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = request.params.id;
+    if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
+        return response.status(400).json({ message: "Invalid Id" });
+    }
     try {
+        const product = yield product_model_1.default.findById(id);
+        if (!product) {
+            return response.status(404).json({ message: "Product Not Found" });
+        }
+        return response.status(200).json({ message: "Found Product", product });
     }
     catch (error) {
         console.log(error);
@@ -42,6 +49,8 @@ exports.createProduct = (0, async_handler_1.asyncHandler)((request, response) =>
         return response.status(400).json({ message: "All fields are required" });
     }
     try {
+        const product = yield product_model_1.default.create({ name, description, price, image, stock, category });
+        return response.status(201).json({ message: "New Product", product });
     }
     catch (error) {
         console.log(error);
@@ -49,7 +58,16 @@ exports.createProduct = (0, async_handler_1.asyncHandler)((request, response) =>
     }
 }));
 exports.updateProduct = (0, async_handler_1.asyncHandler)((request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = request.params.id;
+    if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
+        return response.status(400).json({ message: "Invalid Id" });
+    }
     try {
+        const product = yield product_model_1.default.findByIdAndUpdate(id, request.body, { new: true });
+        if (!product) {
+            return response.status(404).json({ message: "Product Not Found" });
+        }
+        return response.status(200).json({ message: "Updated Product", product });
     }
     catch (error) {
         console.log(error);
@@ -57,7 +75,16 @@ exports.updateProduct = (0, async_handler_1.asyncHandler)((request, response) =>
     }
 }));
 exports.deleteProduct = (0, async_handler_1.asyncHandler)((request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = request.params.id;
+    if (!mongoose_1.default.Types.ObjectId.isValid(id)) {
+        return response.status(400).json({ message: "Invalid Id" });
+    }
     try {
+        const product = yield product_model_1.default.findByIdAndDelete(id);
+        if (!product) {
+            return response.status(404).json({ message: "Product Not Found" });
+        }
+        return response.status(200).json({ message: "Deleted Product", product });
     }
     catch (error) {
         console.log(error);
